@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0ADC85E51B43D668001EB019 /* MyScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ADC85E41B43D668001EB019 /* MyScene.m */; };
 		0ADC85E81B43DCCE001EB019 /* GameOverScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ADC85E71B43DCCE001EB019 /* GameOverScene.m */; };
+		3C21189D1B4587B900CB0656 /* background-music-aac.caf in Resources */ = {isa = PBXBuildFile; fileRef = 3C21189B1B4587B900CB0656 /* background-music-aac.caf */; };
+		3C21189E1B4587B900CB0656 /* pew-pew-lei.caf in Resources */ = {isa = PBXBuildFile; fileRef = 3C21189C1B4587B900CB0656 /* pew-pew-lei.caf */; };
 		B10D8F1F176FE4A100BAD8C4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B10D8F1E176FE4A100BAD8C4 /* Foundation.framework */; };
 		B10D8F21176FE4A100BAD8C4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B10D8F20176FE4A100BAD8C4 /* CoreGraphics.framework */; };
 		B10D8F23176FE4A100BAD8C4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B10D8F22176FE4A100BAD8C4 /* UIKit.framework */; };
@@ -43,6 +45,8 @@
 		0ADC85E41B43D668001EB019 /* MyScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyScene.m; sourceTree = "<group>"; };
 		0ADC85E61B43DCCE001EB019 /* GameOverScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameOverScene.h; sourceTree = "<group>"; };
 		0ADC85E71B43DCCE001EB019 /* GameOverScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameOverScene.m; sourceTree = "<group>"; };
+		3C21189B1B4587B900CB0656 /* background-music-aac.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "background-music-aac.caf"; sourceTree = "<group>"; };
+		3C21189C1B4587B900CB0656 /* pew-pew-lei.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "pew-pew-lei.caf"; sourceTree = "<group>"; };
 		B10D8F1B176FE4A100BAD8C4 /* SpriteKitActionDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpriteKitActionDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B10D8F1E176FE4A100BAD8C4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		B10D8F20176FE4A100BAD8C4 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -99,6 +103,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3C21189A1B4587B900CB0656 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				3C21189B1B4587B900CB0656 /* background-music-aac.caf */,
+				3C21189C1B4587B900CB0656 /* pew-pew-lei.caf */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
 		B10D8F12176FE4A100BAD8C4 = {
 			isa = PBXGroup;
 			children = (
@@ -134,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				B10D8F5B1770124400BAD8C4 /* imagesAtlas.atlas */,
+				3C21189A1B4587B900CB0656 /* Sounds */,
 				B10D8F591770031400BAD8C4 /* resources */,
 				B10D8F55176FE61200BAD8C4 /* ActionScene.h */,
 				B10D8F56176FE61200BAD8C4 /* ActionScene.m */,
@@ -279,8 +293,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C21189D1B4587B900CB0656 /* background-music-aac.caf in Resources */,
 				B10D8F37176FE4A100BAD8C4 /* Images.xcassets in Resources */,
 				B10D8F29176FE4A100BAD8C4 /* InfoPlist.strings in Resources */,
+				3C21189E1B4587B900CB0656 /* pew-pew-lei.caf in Resources */,
 				B10D8F32176FE4A100BAD8C4 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -372,6 +388,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -409,6 +426,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -429,7 +447,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer: 嘉铠 王 (CZ9Q9TR67H)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SpriteKitActionDemo/SpriteKitActionDemo-Prefix.pch";
 				INFOPLIST_FILE = "SpriteKitActionDemo/SpriteKitActionDemo-Info.plist";
@@ -443,7 +461,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer: 嘉铠 王 (CZ9Q9TR67H)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SpriteKitActionDemo/SpriteKitActionDemo-Prefix.pch";
 				INFOPLIST_FILE = "SpriteKitActionDemo/SpriteKitActionDemo-Info.plist";

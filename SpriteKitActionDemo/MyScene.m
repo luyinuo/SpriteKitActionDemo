@@ -9,16 +9,22 @@
 #import "MyScene.h"
 #import "GameOverScene.h"
 
-static const uint32_t projectileCategory     =  0x1 << 0;
-static const uint32_t monsterCategory        =  0x1 << 1;
+static const uint32_t playerCategory         =  0x1 << 0;
+static const uint32_t playerCategory1         =  0x1 << 1;
+static const uint32_t monsterCategory        =  0x1 << 2;
+static const uint32_t bombCategory           =  0x1 << 3;
 
 @interface MyScene()<SKPhysicsContactDelegate>
 @property (nonatomic, strong) NSMutableArray *textures;
 @property (nonatomic, strong) NSMutableArray *foods;
 @property (nonatomic, strong) SKSpriteNode *player;
+@property (nonatomic, strong) SKSpriteNode *player2;
 
 @property (nonatomic) NSTimeInterval lastSpawnTimeInterval;
 @property (nonatomic) NSTimeInterval lastUpdateTimeInterval;
+@property (nonatomic) int monstersDestroyed;
+@property (nonatomic) BOOL touchedHero;
+@property (nonatomic) BOOL touchedHero1;
 @end
 @implementation MyScene
 
@@ -38,7 +44,8 @@ static const uint32_t monsterCategory        =  0x1 << 1;
         SKTexture *texture2 = [SKTexture textureWithImageNamed:@"fish"];
         SKTexture *texture3 = [SKTexture textureWithImageNamed:@"bone"];
         SKTexture *texture4 = [SKTexture textureWithImageNamed:@"bambo"];
-        [_foods addObjectsFromArray:[NSArray arrayWithObjects:texture1,texture2,texture3,texture4, nil]];
+        SKTexture *texture5 = [SKTexture textureWithImageNamed:@"bomber"];
+        [_foods addObjectsFromArray:[NSArray arrayWithObjects:texture1,texture2,texture3,texture4,texture5, nil]];
     }
     return _foods;
 }
@@ -52,43 +59,82 @@ static const uint32_t monsterCategory        =  0x1 << 1;
 }
 
 - (void)createContents{
-    self.backgroundColor = [SKColor blueColor];
-    self.scaleMode = SKSceneScaleModeAspectFit;
-    SKTexture *texture1 = [SKTexture textureWithImageNamed:@"dog"];
-    SKTexture *texture2 = [SKTexture textureWithImageNamed:@"cat"];
-    SKTexture *texture3 = [SKTexture textureWithImageNamed:@"monkey"];
-    SKTexture *texture4 = [SKTexture textureWithImageNamed:@"panda"];
-    [self.textures addObjectsFromArray:[NSArray arrayWithObjects:texture1,texture2,texture3,texture4, nil]];
-    _player = [SKSpriteNode spriteNodeWithTexture:texture1];
-//    SKSpriteNode *player = [SKSpriteNode spriteNodeWithImageNamed:@"dog"];
-    _player.name = @"player";
-    _player.size = CGSizeMake(100, 100);
-    _player.position = CGPointMake(CGRectGetMidX(self.frame), 70);
+    //    self.backgroundColor = [SKColor clearColor];
+    SKSpriteNode *backGround = [SKSpriteNode spriteNodeWithImageNamed:@"bg1"];
+    backGround.size = self.frame.size;
+    backGround.position = CGPointMake(self.frame.size.width/2, self.frame.size.height /2 );
+    [self addChild:backGround];
     
-    SKAction *change = [SKAction runBlock:^{
-        int range = arc4random() % 4;
-        [SKAction setTexture:self.textures[range]];
-    }];
-    SKAction *walkAnimation = [SKAction animateWithTextures:@[texture1, texture2, texture3, texture4] timePerFrame:2];
-    SKAction *repeat = [SKAction repeatActionForever:walkAnimation];
-    [_player runAction:repeat];
+    self.scaleMode = SKSceneScaleModeAspectFit;
+    SKTexture *texture2 = [SKTexture textureWithImageNamed:@"cat_close_1"];
+    
+    _player = [SKSpriteNode spriteNodeWithTexture:texture2];
+    _player.name = @"player";
+    _player.size = CGSizeMake(130, 150);
+    _player.position = CGPointMake(self.frame.size.width/4, 75);
+    _player.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:20];
+    _player.physicsBody.dynamic = YES;
+    _player.physicsBody.categoryBitMask  = playerCategory;
+    _player.physicsBody.contactTestBitMask = monsterCategory;
+    _player.physicsBody.collisionBitMask = 0;
+    
+    _player2 = [SKSpriteNode spriteNodeWithTexture:texture2];
+    _player2.name = @"player2";
+    _player2.size = CGSizeMake(130, 150);
+    _player2.position = CGPointMake(self.frame.size.width*3/4, 75);
+    _player2.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:20];
+    _player2.physicsBody.dynamic = YES;
+    _player2.physicsBody.categoryBitMask  = playerCategory1;
+    _player2.physicsBody.contactTestBitMask = monsterCategory;
+    _player2.physicsBody.collisionBitMask = 0;
+    
+    
+    //    SKAction *walkAnimation = [SKAction animateWithTextures:@[texture2, texture3] timePerFrame:0.2];
+    //    SKAction *repeat = [SKAction repeatActionForever:walkAnimation];
+    //    [_player runAction:repeat];
     [self addChild:_player];
+    [self addChild:_player2];
 }
 
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     UITouch *touch = touches.anyObject;
     CGPoint location = [touch locationInNode:self];
-    SKNode *player = [self childNodeWithName:@"player"];
-    if (player) {
-        NSTimeInterval interval = 320 / 1;
-        CGFloat ranglengt = fabs(player.position.x - location.x);
-        location.x < _player.size.width /2 ?location.x = _player.size.width /2:1;
-        location.x > self.frame.size.width - (_player.size.width /2)?location.x = self.frame.size.width - (_player.size.width /2):1;
-        
-        SKAction *moveBy = [SKAction moveToX:location.x duration:ranglengt/interval];
-        [player runAction:moveBy];
+    SKNode *node = [self nodeAtPoint:location];
+    
+    
+    if ([node.name isEqualToString:@"player"]) {
+        if (YES) NSLog(@"touch in hero");
+        _touchedHero = YES;
+        SKTexture *texture3 = [SKTexture textureWithImageNamed:@"cat"];
+        SKAction *action = [SKAction setTexture:texture3];
+        [_player runAction:action];
+    }else if ([node.name isEqualToString:@"player2"]){
+        _touchedHero1 = YES;
+        SKTexture *texture3 = [SKTexture textureWithImageNamed:@"cat"];
+        SKAction *action = [SKAction setTexture:texture3];
+        [_player2 runAction:action];
     }
+    
+}
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    
+    UITouch *touch = touches.anyObject;
+    CGPoint location = [touch locationInNode:self];
+    SKNode *node = [self nodeAtPoint:location];
+    if ([node.name isEqualToString:@"player"]) {
+        _touchedHero = NO;
+        SKTexture *texture3 = [SKTexture textureWithImageNamed:@"cat_close_1"];
+        SKAction *action = [SKAction setTexture:texture3];
+        [_player runAction:action];
+    }else if ([node.name isEqualToString:@"player2"]){
+        _touchedHero1 = NO;
+        SKTexture *texture3 = [SKTexture textureWithImageNamed:@"cat_close_1"];
+        SKAction *action = [SKAction setTexture:texture3];
+        [_player2 runAction:action];
+    }
+    
 }
 
 - (void)updateWithTimeSinceLastUpdate:(CFTimeInterval)timeSinceLast {
@@ -117,14 +163,20 @@ static const uint32_t monsterCategory        =  0x1 << 1;
 - (void) addFoods
 {
     // Create sprite
-    int random = arc4random() % 4;
+    int random = arc4random() % 5;
     SKTexture *texture = self.foods[random];
     SKSpriteNode * monster = [SKSpriteNode spriteNodeWithTexture:texture];
     monster.size = CGSizeMake(50, 50);
-    monster.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:monster.size]; // 1
+    monster.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:10]; // 1
     monster.physicsBody.dynamic = YES; // 2
-    monster.physicsBody.categoryBitMask = monsterCategory; // 3
-    monster.physicsBody.contactTestBitMask = projectileCategory; // 4
+    if (random < 4) {
+        monster.physicsBody.categoryBitMask = monsterCategory; // 3
+    }else{
+        monster.physicsBody.categoryBitMask = bombCategory; // 3
+    }
+    
+    
+    monster.physicsBody.contactTestBitMask = playerCategory|playerCategory1; // 4
     monster.physicsBody.collisionBitMask = 0; // 5
     
     // Determine where to spawn the monster along the Y axis
@@ -144,20 +196,89 @@ static const uint32_t monsterCategory        =  0x1 << 1;
     int rangeDuration = maxDuration - minDuration;
     int actualDuration = (arc4random() % rangeDuration) + minDuration;
     
+    CGFloat moveToX = random % 2 ==0 ?self.size.width/4:self.size.width *3/4;
     // Create the actions
-    SKAction * actionMove = [SKAction moveTo:CGPointMake(CGRectGetMidX(self.frame), -monster.size.height/2) duration:actualDuration];
+    SKAction * actionMove1 = [SKAction moveTo:CGPointMake(moveToX, 100) duration:actualDuration];
+    SKAction * actionMove2 = [SKAction moveTo:CGPointMake(moveToX, -monster.size.height/2) duration:actualDuration * 100/self.size.height];
     //沿指定的角度旋转
     SKAction *rotateBy = [SKAction rotateByAngle:1.4 duration:0.5];
     //旋转到指定的角度
     SKAction *rotateTo = [SKAction rotateToAngle:0 duration:0.5];
     
     SKAction * actionMoveDone = [SKAction removeFromParent];
-    SKAction *group = [SKAction group:@[rotateBy,rotateTo,actionMove]];
+    
+    SKAction *group = [SKAction group:@[rotateBy,rotateTo,actionMove1]];
     SKAction * loseAction = [SKAction runBlock:^{
-        SKTransition *reveal = [SKTransition flipHorizontalWithDuration:0.5];
+        SKTransition *reveal = [SKTransition fadeWithColor:[UIColor blackColor] duration:2];
         SKScene * gameOverScene = [[GameOverScene alloc] initWithSize:self.size won:NO];
         [self.view presentScene:gameOverScene transition: reveal];
     }];
-    [monster runAction:[SKAction sequence:@[group, actionMoveDone]]];
+    
+    
+    if (random < 4) {
+        [monster runAction:[SKAction sequence:@[group,actionMove2,loseAction, actionMoveDone]]];
+    }else{
+        [monster runAction:[SKAction sequence:@[group,actionMove2, actionMoveDone]]];
+    }
+    
+}
+
+- (void)projectile:(SKSpriteNode *)projectile didCollideWithMonster:(SKSpriteNode *)monster {
+    NSLog(@"Hit");
+    //    [projectile removeFromParent];
+    [self runAction:[SKAction playSoundFileNamed:@"pew-pew-lei.caf" waitForCompletion:NO]];
+    [monster removeFromParent];
+    self.monstersDestroyed++;
+    if (self.monstersDestroyed > 30) {
+        SKTransition *reveal = [SKTransition fadeWithDuration:0.5];
+        SKScene * gameOverScene = [[GameOverScene alloc] initWithSize:self.size won:YES];
+        [self.view presentScene:gameOverScene transition: reveal];
+    }
+}
+
+- (void)didBeginContact:(SKPhysicsContact *)contact
+{
+    
+    // 1
+    SKPhysicsBody *firstBody, *secondBody;
+    
+    if (contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask)
+    {
+        firstBody = contact.bodyA;
+        secondBody = contact.bodyB;
+    }
+    else
+    {
+        firstBody = contact.bodyB;
+        secondBody = contact.bodyA;
+    }
+    
+    
+    // 2
+    if (((firstBody.categoryBitMask & playerCategory) != 0 &&
+         (secondBody.categoryBitMask & monsterCategory) != 0) ||
+        ((firstBody.categoryBitMask & playerCategory1) != 0 &&
+         (secondBody.categoryBitMask & monsterCategory) != 0 ))
+    {
+        if (!_touchedHero1 && !_touchedHero) {
+            return;
+        }
+        if ((firstBody.categoryBitMask & playerCategory) != 0 ) {
+            if (_touchedHero) {
+                return;
+            }
+        }
+        if ((firstBody.categoryBitMask & playerCategory1) != 0 && _touchedHero1) {
+            if (!_touchedHero1) {
+                return;
+            }
+        }
+        [self projectile:(SKSpriteNode *) firstBody.node didCollideWithMonster:(SKSpriteNode *) secondBody.node];
+    }else{
+        
+        SKTransition *reveal = [SKTransition flipHorizontalWithDuration:0.5];
+        SKScene * gameOverScene = [[GameOverScene alloc] initWithSize:self.size won:NO];
+        [self.view presentScene:gameOverScene transition: reveal];
+    }
 }
 @end
