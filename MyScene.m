@@ -15,6 +15,10 @@ static const uint32_t monsterCategory        =  0x1 << 2;
 static const uint32_t bombCategory           =  0x1 << 3;
 
 @interface MyScene()<SKPhysicsContactDelegate>
+{
+    SKShapeNode *pivotalAnchor;
+    SKSpriteNode *pendulumOne;
+}
 @property (nonatomic, strong) NSMutableArray *textures;
 @property (nonatomic, strong) NSMutableArray *foods;
 @property (nonatomic, strong) SKSpriteNode *player;
@@ -49,13 +53,49 @@ static const uint32_t bombCategory           =  0x1 << 3;
     }
     return _foods;
 }
+
+#pragma mark -  Setting Up Pendulum
+
+- (SKShapeNode*) createPivotPoint:(int) radius
+{
+    SKShapeNode *wheel = [[SKShapeNode alloc] init];
+    CGMutablePathRef myPath = CGPathCreateMutable();
+    CGPathAddArc(myPath, NULL, 0,0, radius, 0, M_PI*2, YES);
+    wheel.path = myPath;
+    return wheel;
+}
 - (void)didMoveToView:(SKView *)view{
     if (!self.contentCreated) {
         [self createContents];
         self.contentCreated = YES;
-        self.physicsWorld.gravity = CGVectorMake(0,0);
         self.physicsWorld.contactDelegate = self;
-        self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
+        
+        
+        self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:CGRectMake(0, 0, self.size.width, self.size.height)];
+        self.physicsBody.friction = 0;
+        self.physicsBody.angularDamping = 0;
+        self.physicsBody.restitution = 0;
+        self.physicsBody.linearDamping = 0;
+        
+        // 1. Pivotal Anchor
+        pivotalAnchor = [self createPivotPoint:1];
+        pivotalAnchor.position = CGPointMake(self.size.width/4, 200);
+        pivotalAnchor.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:1];
+        pivotalAnchor.physicsBody.dynamic = NO;
+        [self addChild:pivotalAnchor];
+        
+        // 2. First Pendulum
+        pendulumOne = [SKSpriteNode spriteNodeWithColor:[UIColor whiteColor] size:CGSizeMake(5, 120)];
+        pendulumOne.position = CGPointMake(self.size.width/4, 200-120/2);
+        pendulumOne.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:pendulumOne.size];
+        
+        pendulumOne.physicsBody.linearDamping = 0;
+        pendulumOne.physicsBody.angularDamping = 0;
+        pendulumOne.physicsBody.friction = 0;
+        pendulumOne.physicsBody.restitution = 0;
+        [self addChild:pendulumOne];
+        
+        [self.physicsWorld addJoint:[SKPhysicsJointPin jointWithBodyA:pendulumOne.physicsBody bodyB:pivotalAnchor.physicsBody anchor:pivotalAnchor.position]];
     }
 }
 
@@ -74,7 +114,7 @@ static const uint32_t bombCategory           =  0x1 << 3;
     _player.size = CGSizeMake(130, 150);
     _player.position = CGPointMake(self.frame.size.width/4, 75);
     _player.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:20];
-    _player.physicsBody.dynamic = YES;
+    _player.physicsBody.dynamic = NO;
     _player.physicsBody.categoryBitMask  = playerCategory;
     _player.physicsBody.contactTestBitMask = monsterCategory;
     _player.physicsBody.collisionBitMask = 0;
@@ -84,7 +124,7 @@ static const uint32_t bombCategory           =  0x1 << 3;
     _player2.size = CGSizeMake(130, 150);
     _player2.position = CGPointMake(self.frame.size.width*3/4, 75);
     _player2.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:20];
-    _player2.physicsBody.dynamic = YES;
+    _player2.physicsBody.dynamic = NO;
     _player2.physicsBody.categoryBitMask  = playerCategory1;
     _player2.physicsBody.contactTestBitMask = monsterCategory;
     _player2.physicsBody.collisionBitMask = 0;
